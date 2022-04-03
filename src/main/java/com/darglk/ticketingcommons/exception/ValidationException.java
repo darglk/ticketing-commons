@@ -1,0 +1,21 @@
+package com.darglk.ticketingcommons.exception;
+
+import org.springframework.validation.Errors;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+public class ValidationException extends CustomException {
+    private final Errors errors;
+    public ValidationException(Errors errors) {
+        super("validation error", 400);
+        this.errors = errors;
+    }
+
+    @Override
+    public List<ErrorResponse> serializeErrors() {
+        return errors.getFieldErrors().stream()
+                .map(error -> new ErrorResponse(error.getDefaultMessage(), error.getField()))
+                .collect(Collectors.toList());
+    }
+}
