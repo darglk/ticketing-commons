@@ -8,22 +8,22 @@ import lombok.AllArgsConstructor;
 import java.io.IOException;
 
 @AllArgsConstructor
-public abstract class BaseListener {
+public abstract class BaseListener<T> {
     private Subjects subject;
     private String queueGroupName;
     private JetStream client;
     private Connection connection;
 
-    abstract void onMessage(String data, Message msg);
+    abstract void onMessage(T data, Message msg);
 
-    public void listen() {
+    public void listen(Class<T> clazz) {
         try {
             this.client.subscribe(
                     subject.getSubject(),
                     this.queueGroupName,
                     connection.createDispatcher(),
                     message -> {
-                        String msg = this.parseMessage(message);
+                        T msg = this.parseMessage(message, clazz);
                         this.onMessage(msg, message);
                         },false,  PushSubscribeOptions.builder().build());
         } catch (IOException | JetStreamApiException e) {
@@ -31,10 +31,10 @@ public abstract class BaseListener {
         }
     }
 
-    private String parseMessage(Message msg) {
+    private T parseMessage(Message msg, Class<T> clazz) {
         ObjectMapper objectMapper = new ObjectMapper();
         try {
-            return objectMapper.readValue(msg.getData(), String.class);
+            return objectMapper.readValue(msg.getData(), clazz);
         } catch (IOException e) {
             e.printStackTrace();
         }
