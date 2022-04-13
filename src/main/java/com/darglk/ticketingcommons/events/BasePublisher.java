@@ -6,10 +6,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nats.client.JetStream;
 import io.nats.client.api.PublishAck;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.util.concurrent.CompletableFuture;
 
 @AllArgsConstructor
+@Getter
 public abstract class BasePublisher {
     private Subjects subject;
     private JetStream client;

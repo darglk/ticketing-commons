@@ -4,10 +4,12 @@ import com.darglk.ticketingcommons.events.types.Subjects;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.nats.client.*;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 import java.io.IOException;
 
 @AllArgsConstructor
+@Getter
 public abstract class BaseListener<T> {
     private Subjects subject;
     private String queueGroupName;
