@@ -19,13 +19,11 @@ public abstract class BaseListener<T> {
     public abstract void onMessage(T data, Message msg);
 
     public void listen(Class<T> clazz) {
-        try {
-            final var sub = this.connection.subscribe(subject.getSubject(), queueGroupName);
-            final var mesage = sub.nextMessage(0);
-            onMessage(parseMessage(mesage, clazz), mesage);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
+            this.connection.createDispatcher(msg -> {
+                onMessage(parseMessage(msg, clazz), msg);
+            }).subscribe(subject.getSubject(), queueGroupName);
+
     }
 
     private T parseMessage(Message msg, Class<T> clazz) {
