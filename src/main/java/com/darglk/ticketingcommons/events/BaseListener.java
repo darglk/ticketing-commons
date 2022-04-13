@@ -14,7 +14,7 @@ public abstract class BaseListener<T> {
     private JetStream client;
     private Connection connection;
 
-    abstract void onMessage(T data, Message msg);
+    public abstract void onMessage(T data, Message msg);
 
     public void listen(Class<T> clazz) {
         try {
