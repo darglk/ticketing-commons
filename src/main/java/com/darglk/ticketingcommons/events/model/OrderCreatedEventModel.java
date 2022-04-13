@@ -1,5 +1,6 @@
 package com.darglk.ticketingcommons.events.model;
 
+import com.darglk.ticketingcommons.events.types.OrderStatus;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -9,7 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class OrderCreatedEventModel {
     private String orderId;
-    private String orderStatus;
+    private OrderStatus orderStatus;
     private String userId;
     private Long version;
     private String expiresAt;
