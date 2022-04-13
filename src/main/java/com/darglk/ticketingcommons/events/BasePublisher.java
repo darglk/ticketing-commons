@@ -3,6 +3,7 @@ package com.darglk.ticketingcommons.events;
 import com.darglk.ticketingcommons.events.types.Subjects;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.nats.client.Connection;
 import io.nats.client.JetStream;
 import io.nats.client.api.PublishAck;
 import lombok.AllArgsConstructor;
@@ -15,8 +16,9 @@ import java.util.concurrent.CompletableFuture;
 public abstract class BasePublisher {
     private Subjects subject;
     private JetStream client;
+    private Connection connection;
 
-    public CompletableFuture<PublishAck> publish(Object data) {
+    public void publish(Object data) {
         ObjectMapper objectMapper = new ObjectMapper();
         String dataStr = "";
         try {
@@ -24,6 +26,6 @@ public abstract class BasePublisher {
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        return this.client.publishAsync(subject.getSubject(), dataStr.getBytes());
+        this.connection.publish(subject.getSubject(), dataStr.getBytes());
     }
 }

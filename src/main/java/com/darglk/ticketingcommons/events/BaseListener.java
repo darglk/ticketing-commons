@@ -20,15 +20,10 @@ public abstract class BaseListener<T> {
 
     public void listen(Class<T> clazz) {
         try {
-            this.client.subscribe(
-                    subject.getSubject(),
-                    this.queueGroupName,
-                    connection.createDispatcher(),
-                    message -> {
-                        T msg = this.parseMessage(message, clazz);
-                        this.onMessage(msg, message);
-                        },false,  PushSubscribeOptions.builder().build());
-        } catch (IOException | JetStreamApiException e) {
+            final var sub = this.connection.subscribe(subject.getSubject(), queueGroupName);
+            final var mesage = sub.nextMessage(0);
+            onMessage(parseMessage(mesage, clazz), mesage);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
