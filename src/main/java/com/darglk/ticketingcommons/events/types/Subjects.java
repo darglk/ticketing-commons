@@ -7,7 +7,8 @@ public enum Subjects {
     TicketCreated("ticket:created"),
     TicketUpdated("ticket:updated"),
     OrderCreated("order:created"),
-    OrderCancelled("order:cancelled");
+    OrderCancelled("order:cancelled"),
+    ExpirationComplete("expiration:complete");
 
     Subjects(String subject) {
         this.subject = subject;
