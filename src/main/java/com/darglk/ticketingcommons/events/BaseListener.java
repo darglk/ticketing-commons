@@ -3,7 +3,6 @@ package com.darglk.ticketingcommons.events;
 import com.darglk.ticketingcommons.events.types.Subjects;
 import com.darglk.ticketingcommons.utils.JSONUtils;
 import io.nats.client.Connection;
-import io.nats.client.JetStream;
 import io.nats.client.Message;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,7 +12,6 @@ import lombok.Getter;
 public abstract class BaseListener<T> {
     private Subjects subject;
     private String queueGroupName;
-    private JetStream client;
     private Connection connection;
 
     public abstract void onMessage(T data, Message msg);
