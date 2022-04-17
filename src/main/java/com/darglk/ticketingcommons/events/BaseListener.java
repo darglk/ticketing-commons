@@ -1,12 +1,12 @@
 package com.darglk.ticketingcommons.events;
 
 import com.darglk.ticketingcommons.events.types.Subjects;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.nats.client.*;
+import com.darglk.ticketingcommons.utils.JSONUtils;
+import io.nats.client.Connection;
+import io.nats.client.JetStream;
+import io.nats.client.Message;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-
-import java.io.IOException;
 
 @AllArgsConstructor
 @Getter
@@ -19,20 +19,8 @@ public abstract class BaseListener<T> {
     public abstract void onMessage(T data, Message msg);
 
     public void listen(Class<T> clazz) {
-
-            this.connection.createDispatcher(msg -> {
-                onMessage(parseMessage(msg, clazz), msg);
-            }).subscribe(subject.getSubject(), queueGroupName);
-
-    }
-
-    private T parseMessage(Message msg, Class<T> clazz) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            return objectMapper.readValue(msg.getData(), clazz);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        throw new IllegalStateException("Failed to parse message");
+        this.connection
+                .createDispatcher(msg -> onMessage(JSONUtils.fromJson(new String(msg.getData()), clazz), msg))
+                .subscribe(subject.getSubject(), queueGroupName);
     }
 }

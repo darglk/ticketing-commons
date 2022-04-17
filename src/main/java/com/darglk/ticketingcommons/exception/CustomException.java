@@ -8,7 +8,7 @@ import java.util.Map;
 
 @Getter
 public abstract class CustomException extends RuntimeException {
-    private int statusCode;
+    private final int statusCode;
 
     public CustomException(String message, int statusCode) {
         super(message);
@@ -18,8 +18,6 @@ public abstract class CustomException extends RuntimeException {
     public abstract List<ErrorResponse> serializeErrors();
 
     public static ResponseEntity<?> handleCustomException(CustomException ex) {
-        return ResponseEntity.status(ex.getStatusCode()).body(Map.of(
-                "errors", ex.serializeErrors()
-        ));
+        return ResponseEntity.status(ex.getStatusCode()).body(Map.of("errors", ex.serializeErrors()));
     }
 }

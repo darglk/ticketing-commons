@@ -3,10 +3,12 @@ package com.darglk.ticketingcommons.config.security.filter;
 import com.darglk.ticketingcommons.exception.CustomException;
 import com.darglk.ticketingcommons.exception.ErrorResponse;
 import com.darglk.ticketingcommons.exception.NotAuthorizedException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.darglk.ticketingcommons.utils.JSONUtils;
+import com.darglk.ticketingcommons.utils.JwtUtils;
 import io.jsonwebtoken.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -32,32 +34,20 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws IOException, ServletException {
         UsernamePasswordAuthenticationToken authentication = null;
-        ObjectMapper objectMapper = new ObjectMapper();
         response.setContentType("application/json");
 
         try {
              authentication = getAuthentication(request);
         } catch (CustomException error) {
             response.setStatus(error.getStatusCode());
-            response.getWriter().write(
-                    objectMapper.writeValueAsString(
-                            Map.of(
-                                    "errors", error.serializeErrors()
-                            )
-                    )
-            );
+            response.getWriter().write(JSONUtils.toJson(Map.of("errors", error.serializeErrors())));
             return;
         } catch (Exception exception) {
-            response.setStatus(400);
-            response.getWriter().write(
-                    objectMapper.writeValueAsString(
-                            Map.of(
-                                    "errors", List.of(
-                                            new ErrorResponse("Something went wrong", null)
-                                    )
-                            )
-                    )
-            );
+            response.setStatus(HttpStatus.BAD_REQUEST.value());
+            response.getWriter()
+                    .write(JSONUtils.toJson(
+                            Map.of("errors",
+                                    List.of(new ErrorResponse("Something went wrong", null)))));
             return;
         }
 
@@ -69,9 +59,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String token = request.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer ")) {
             try {
-                Jws<Claims> parsedToken = Jwts.parser()
-                        .setSigningKey("kurwajapierdolemozedluzszytenkluczpierdolonykurwajapierdolemozedluzszytenkluczpierdolonykurwajapierdolemozedluzszytenkluczpierdolonykurwajapierdolemozedluzszytenkluczpierdolonykurwajapierdolemozedluzszytenkluczpierdolonykurwajapierdolemozedluzszytenkluczpierdolonykurwajapierdolemozedluzszytenkluczpierdolonykurwajapierdolemozedluzszytenkluczpierdolonykurwajapierdolemozedluzszytenkluczpierdolonykurwajapierdolemozedluzszytenkluczpierdolonykurwajapierdolemozedluzszytenkluczpierdolonykurwajapierdolemozedluzszytenkluczpierdolony".getBytes())
-                        .parseClaimsJws(token.replace("Bearer ", ""));
+                Jws<Claims> parsedToken = JwtUtils.parseToken(token);
 
                 String username = parsedToken.getBody().getSubject();
 
