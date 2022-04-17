@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.apache.logging.log4j.util.Strings;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.Instant;
 import java.util.Date;
 
@@ -17,8 +18,8 @@ public class JwtUtils {
                 .signWith(Keys.hmacShaKeyFor(System.getenv("JWT_SECRET").getBytes()), SignatureAlgorithm.HS512)
                 .setIssuer(System.getenv("JWT_ISSUER"))
                 .setAudience(System.getenv("JWT_AUDIENCE"))
-                .setSubject(userId)
-                .setId(username)
+                .setSubject(username)
+                .setId(userId)
                 .setExpiration(new Date(System.currentTimeMillis()
                         + Long.parseLong(System.getenv("JWT_EXPIRATION_MILLIS"))))
                 .setIssuedAt(Date.from(Instant.now()))
@@ -30,5 +31,12 @@ public class JwtUtils {
                 .setSigningKey(System.getenv("JWT_SECRET").getBytes())
                 .build()
                 .parseClaimsJws(token.replace("Bearer ", Strings.EMPTY));
+    }
+
+    public static String getUserIdFromToken(HttpServletRequest request) {
+        final var token = request.getHeader("Authorization");
+        final var claims = parseToken(token);
+
+        return claims.getBody().getId();
     }
 }
